@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bid Your Price</title>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('back.jpeg'); /* Replace with your desktop image URL */
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            text-align: center;
+        }
+        h1, h2 {
+            margin: 20px 0;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px #000000;
+        }
+        .timer {
+            background-color: rgb(237, 18, 18);
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .bid-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            margin-bottom: 20px;
+            width: 250px;
+        }
+        .bid-button:hover {
+            transform: scale(1.1);
+            background-color: #388e3c;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1001;
+        }
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .modal-content input {
+            width: calc(100% - 20px);
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .modal-content button {
+            background-color: #45a049;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        .modal-content button:hover {
+            background-color: #388e3c;
+        }
+        .modal-content button:last-child {
+            background-color: #dc3545;
+        }
+        .bid-list {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .bid-item {
+            background-color: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 15px;
+            gap: 15px;
+        }
+        .bid-item span {
+            font-size: 16px;
+            color: #343a40;
+            flex: 1 1 auto;
+            margin: 5px 0;
+        }
+        .bid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        .bid-item.highest-bid {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+
+        /* Celebration Animation */
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: gold;
+            font-weight: bold;
+            animation: celebrate 2s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile-specific styles */
+        @media only screen and (max-width: 768px) {
+            body {
+                background-image: url('new.jpeg'); /* Replace with your mobile image URL */
+                background-size: cover;
+                background-position: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>ROAOR FARMSTAYS TIPESHWAR</h1>
+    <h2>Bid Your Price</h2>
+    <div class="timer" id="timer">Bid ends in: 00:00:00</div>
+
+    <!-- Bid Modal -->
+    <div id="bidModal" class="modal">
+        <div class="modal-content">
+            <h2>Place Your Bid</h2>
+            <input type="text" id="bidName" placeholder="Enter your name">
+            <input type="text" id="bidPhone" placeholder="Enter your phone number">
+            <input type="text" id="bidCity" placeholder="Enter your city">
+            <input type="number" id="bidAmount" placeholder="Enter your bid amount" min="0">
+            <button onclick="submitBid()">Submit Bid</button>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <div id="bidList" class="bid-list"></div>
+
+    <button class="bid-button" onclick="openModal()">Make a Bid</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWsuEoNqzpQ_TTKAOv7aGQAzIjGiSUOYQ",
+            authDomain: "roar-bid.firebaseapp.com",
+            databaseURL: "https://roar-bid-default-rtdb.firebaseio.com",
+            projectId: "roar-bid",
+            storageBucket: "roar-bid.firebasestorage.app",
+            messagingSenderId: "220357721568",
+            appId: "1:220357721568:web:6119d700d8ab1d67083f85"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const bidsRef = ref(database, 'bids');
+        const highestBidRef = ref(database, 'highestBid');
+
+        let lastHighestBid = 0; // Track last highest bid
+
+        window.openModal = function () {
+            document.getElementById('bidModal').classList.add('show');
+        };
+
+        window.closeModal = function () {
+            document.getElementById('bidModal').classList.remove('show');
+        };
+
+        window.submitBid = function () {
+            const name = document.getElementById('bidName').value.trim();
+            const phone = document.getElementById('bidPhone').value.trim();
+            const city = document.getElementById('bidCity').value.trim();
+            const amount = parseFloat(document.getElementById('bidAmount').value.trim());
+
+            if (name && phone && city && amount > 0) {
+                onValue(highestBidRef, (snapshot) => {
+                    const currentHighestBid = snapshot.val() || 0;
+
+                    if (amount > currentHighestBid) {
+                        push(bidsRef, { name, phone, city, amount });
+                        set(highestBidRef, amount);
+
+                        // Celebration effect if the bid is higher
+                        if (amount > lastHighestBid) {
+                            triggerCelebration();
+                            lastHighestBid = amount; // Update the last highest bid
+                        }
+
+                        closeModal();
+                    } else {
+                        alert('Your bid must be higher than the current highest bid!');
+                    }
+                }, { onlyOnce: true });
+            } else {
+                alert('Please fill in all fields with valid data!');
+            }
+        };
+
+        onValue(bidsRef, (snapshot) => {
+            const bidList = document.getElementById('bidList');
+            bidList.innerHTML = '';
+            const bids = [];
+
+            snapshot.forEach((childSnapshot) => {
+                bids.push(childSnapshot.val());
+            });
+
+            bids.sort((a, b) => b.amount - a.amount);
+
+            bids.forEach((bid, index) => {
+                const bidItem = document.createElement('div');
+                bidItem.className = 'bid-item' + (index === 0 ? ' highest-bid' : '');
+                bidItem.innerHTML = `
+                    <span><strong>Name:</strong> ${bid.name}</span>
+                    <span><strong>City:</strong> ${bid.city}</span>
+                    <span><strong>Bid:</strong> ₹${bid.amount}</span>
+                `;
+                bidList.appendChild(bidItem);
+            });
+        });
+
+        const timerElement = document.getElementById('timer');
+
+        // Set your custom target date and time here
+        const targetDate = new Date('2024-12-24 12:00:00'); // Example: Set to December 24, 2024 at 12:00 PM
+
+        setInterval(() => {
+            const distance = targetDate - new Date();
+
+            if (distance > 0) {
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                timerElement.textContent = `Bid ends in: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                timerElement.textContent = 'Bidding has ended!';
+            }
+        }, 1000);
+
+        function triggerCelebration() {
+            const celebrationMessage = document.createElement('div');
+            celebrationMessage.classList.add('celebration');
+            celebrationMessage.textContent = '🎉 New Highest Bid! 🎉';
+            document.body.appendChild(celebrationMessage);
+
+            setTimeout(() => {
+                celebrationMessage.remove();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
