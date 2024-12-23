@@ -7,36 +7,41 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: url('back.jpeg');
-            background-size: cover;
-            background-position: center;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            text-align: center;
-            overflow: hidden;
-        }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url('back.jpeg'); /* Replace with your desktop image URL */
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    text-align: center;
+    width: 100%; /* Ensure full width */
+    overflow: hidden; /* Prevents scrollbars if content overflows */
+     /* Font size scales with the viewport width */
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 5vw; /* Slightly larger text for smaller screens */
+    }
+}
+
+
 
         h1, h2, h3 {
-            margin: 10px 0;
+            margin: 20px 0;
             color: #ffffff;
             text-shadow: 1px 1px 2px #000000;
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-            border-radius: 10px;
-            width: fit-content;
-            display: inline-block;
         }
 
         .timer {
-            background-color: rgba(237, 18, 18, 0.8);
+            background-color: rgb(237, 18, 18);
             color: #ffffff;
             padding: 10px 15px;
             border-radius: 10px;
@@ -51,14 +56,14 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 15px 25px;
-            font-size: 18px;
+            padding: 20px 30px;
+            font-size: 20px;
             border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s, background-color 0.2s;
             margin-bottom: 20px;
-            width: 180px;
+            width: 200px;
         }
 
         .bid-button:hover {
@@ -106,10 +111,10 @@
             background-color: #45a049;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 15px;
             cursor: pointer;
             width: 100%;
-            font-size: 16px;
+            font-size: 18px;
             margin: 10px 0;
             transition: background-color 0.2s;
         }
@@ -126,6 +131,8 @@
             max-width: 600px;
             margin: 20px auto;
             padding: 10px;
+            max-height: 400px; /* Adjust as necessary */
+            overflow-y: auto; /* Enable vertical scrolling */
         }
 
         .bid-item {
@@ -138,8 +145,8 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            transition: transform 0.2s, box-shadow 0.2s;
             gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .bid-item span {
@@ -158,12 +165,13 @@
             font-weight: bold;
         }
 
+        /* Celebration Animation */
         .celebration {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 30px;
+            font-size: 40px;
             color: gold;
             font-weight: bold;
             animation: celebrate 2s ease-out;
@@ -184,32 +192,23 @@
             }
         }
 
+        /* Mobile-specific styles */
         @media only screen and (max-width: 768px) {
             body {
-                background-image: url('new.jpeg');
+                background-image: url('new.jpeg'); /* Replace with your mobile image URL */
                 background-size: cover;
                 background-position: center;
-            }
-
-            .bid-button {
-                width: 150px;
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-
-            .modal-content {
-                width: 90%;
             }
         }
     </style>
 </head>
 <body>
-    <h1>ROAOR FARMSTAYS TIPESHWAR</h1>
-    <h2>Bid Your Price for 31-12-2024</h2>
-    <h3>New Year</h3>
+    <h2>ROAR FARMSTAYS TIPESHWAR</h2>
+    <h3>Bid Your Price for 31-12-2024</h3>
     <button class="bid-button" onclick="openModal()">Make a Bid</button>
     <div class="timer" id="timer">Bid ends in: 00:00:00</div>
 
+    <!-- Bid Modal -->
     <div id="bidModal" class="modal">
         <div class="modal-content">
             <h2>Place Your Bid</h2>
@@ -233,9 +232,9 @@
             authDomain: "roar-bid.firebaseapp.com",
             databaseURL: "https://roar-bid-default-rtdb.firebaseio.com",
             projectId: "roar-bid",
-            storageBucket: "roar-bid.appspot.com",
+            storageBucket: "roar-bid.firebasestorage.app",
             messagingSenderId: "220357721568",
-            appId: "1:220357721568:web:6119d700d8ab1d67083f85"
+            appId: "1:1234567890:web:abcdef123456"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -243,7 +242,6 @@
 
         const bidsRef = ref(database, 'bids');
         const highestBidRef = ref(database, 'highestBid');
-
         let lastHighestBid = 0;
 
         window.openModal = function () {
@@ -269,71 +267,70 @@
                         set(highestBidRef, amount);
 
                         if (amount > lastHighestBid) {
+                            triggerCelebration();
                             lastHighestBid = amount;
-                            const celebration = document.createElement('div');
-                            celebration.className = 'celebration';
-                            celebration.textContent = `Congratulations ${name}! You are the highest bidder with ₹${amount}`;
-                            document.body.appendChild(celebration);
-
-                            setTimeout(() => {
-                                celebration.remove();
-                            }, 2000);
                         }
+
                         closeModal();
                     } else {
-                        alert('Your bid must be higher than the current highest bid.');
+                        alert('Your bid must be higher than the current highest bid!');
                     }
                 }, { onlyOnce: true });
             } else {
-                alert('Please fill in all fields with valid information.');
+                alert('Please fill in all fields with valid data!');
             }
         };
 
         onValue(bidsRef, (snapshot) => {
             const bidList = document.getElementById('bidList');
             bidList.innerHTML = '';
-            const bids = snapshot.val();
-            let highestBid = 0;
+            const bids = [];
 
-            for (const key in bids) {
-                const { name, phone, city, amount } = bids[key];
+            snapshot.forEach((childSnapshot) => {
+                bids.push(childSnapshot.val());
+            });
+
+            bids.sort((a, b) => b.amount - a.amount);
+
+            bids.forEach((bid, index) => {
                 const bidItem = document.createElement('div');
-                bidItem.className = 'bid-item';
+                bidItem.className = 'bid-item' + (index === 0 ? ' highest-bid' : '');
                 bidItem.innerHTML = `
-                    <span> ${name}</span>
-                    <span> ${city}</span>
-                    <span> ₹${amount}</span>
+                    <span><strong>Name:</strong> ${bid.name}</span>
+                    <span><strong>City:</strong> ${bid.city}</span>
+                    <span><strong>Bid:</strong> ₹${bid.amount}</span>
                 `;
-                if (amount > highestBid) {
-                    highestBid = amount;
-                    bidItem.classList.add('highest-bid');
-                }
                 bidList.appendChild(bidItem);
-            }
+            });
         });
 
-        const countdownTimer = (deadline) => {
-            const timerElement = document.getElementById('timer');
-            const updateTimer = () => {
-                const now = new Date().getTime();
-                const distance = deadline - now;
+        const timerElement = document.getElementById('timer');
+        const targetDate = new Date('2024-12-31 23:59:59');
 
-                if (distance < 0) {
-                    timerElement.textContent = 'Bidding has ended.';
-                    clearInterval(interval);
-                } else {
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    timerElement.textContent = `Bid ends in: ${hours}h ${minutes}m ${seconds}s`;
-                }
-            };
-            const interval = setInterval(updateTimer, 1000);
-            updateTimer();
-        };
+        setInterval(() => {
+            const distance = targetDate - new Date();
 
-        const biddingDeadline = new Date('2024-12-31T23:59:59').getTime();
-        countdownTimer(biddingDeadline);
+            if (distance > 0) {
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                timerElement.textContent = `Bid ends in: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                timerElement.textContent = 'Bidding has ended!';
+            }
+        }, 1000);
+
+        function triggerCelebration() {
+            const celebrationMessage = document.createElement('div');
+            celebrationMessage.classList.add('celebration');
+            celebrationMessage.textContent = '🎉 New Highest Bid! 🎉';
+            document.body.appendChild(celebrationMessage);
+
+            setTimeout(() => {
+                celebrationMessage.remove();
+            }, 2000);
+        }
     </script>
 </body>
 </html>
