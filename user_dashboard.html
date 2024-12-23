@@ -11,7 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('back.jpeg'); /* Replace with your desktop image URL */
+            background-image: url('back.jpeg');
             background-size: cover;
             background-position: center;
             color: #ffffff;
@@ -21,40 +21,51 @@
             flex-direction: column;
             height: 100vh;
             text-align: center;
+            overflow: hidden;
         }
-        h1, h2 {
-            margin: 20px 0;
+
+        h1, h2, h3 {
+            margin: 10px 0;
             color: #ffffff;
             text-shadow: 1px 1px 2px #000000;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+            width: fit-content;
+            display: inline-block;
         }
+
         .timer {
-            background-color: rgb(237, 18, 18);
+            background-color: rgba(237, 18, 18, 0.8);
             color: #ffffff;
             padding: 10px 15px;
             border-radius: 10px;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
         }
+
         .bid-button {
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 20px 30px;
-            font-size: 20px;
-            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s, background-color 0.2s;
             margin-bottom: 20px;
-            width: 250px;
+            width: 180px;
         }
+
         .bid-button:hover {
             transform: scale(1.1);
             background-color: #388e3c;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -69,10 +80,12 @@
             transition: opacity 0.3s;
             z-index: 1001;
         }
+
         .modal.show {
             display: flex;
             opacity: 1;
         }
+
         .modal-content {
             background-color: white;
             color: black;
@@ -81,34 +94,40 @@
             width: 300px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
+
         .modal-content input {
             width: calc(100% - 20px);
             margin: 10px 0;
             padding: 10px;
             font-size: 16px;
         }
+
         .modal-content button {
             background-color: #45a049;
             color: white;
             border: none;
-            padding: 15px;
+            padding: 10px;
             cursor: pointer;
             width: 100%;
-            font-size: 18px;
+            font-size: 16px;
             margin: 10px 0;
             transition: background-color 0.2s;
         }
+
         .modal-content button:hover {
             background-color: #388e3c;
         }
+
         .modal-content button:last-child {
             background-color: #dc3545;
         }
+
         .bid-list {
             max-width: 600px;
             margin: 20px auto;
             padding: 10px;
         }
+
         .bid-item {
             background-color: white;
             margin: 10px 0;
@@ -120,31 +139,31 @@
             align-items: center;
             flex-wrap: wrap;
             transition: transform 0.2s, box-shadow 0.2s;
-            padding: 15px;
             gap: 15px;
         }
+
         .bid-item span {
             font-size: 16px;
             color: #343a40;
             flex: 1 1 auto;
-            margin: 5px 0;
         }
+
         .bid-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
         }
+
         .bid-item.highest-bid {
             background-color: #ffeb3b;
             font-weight: bold;
         }
 
-        /* Celebration Animation */
         .celebration {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 40px;
+            font-size: 30px;
             color: gold;
             font-weight: bold;
             animation: celebrate 2s ease-out;
@@ -165,12 +184,21 @@
             }
         }
 
-        /* Mobile-specific styles */
         @media only screen and (max-width: 768px) {
             body {
-                background-image: url('new.jpeg'); /* Replace with your mobile image URL */
+                background-image: url('new.jpeg');
                 background-size: cover;
                 background-position: center;
+            }
+
+            .bid-button {
+                width: 150px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .modal-content {
+                width: 90%;
             }
         }
     </style>
@@ -182,7 +210,6 @@
     <button class="bid-button" onclick="openModal()">Make a Bid</button>
     <div class="timer" id="timer">Bid ends in: 00:00:00</div>
 
-    <!-- Bid Modal -->
     <div id="bidModal" class="modal">
         <div class="modal-content">
             <h2>Place Your Bid</h2>
@@ -197,7 +224,6 @@
 
     <div id="bidList" class="bid-list"></div>
 
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
@@ -207,7 +233,7 @@
             authDomain: "roar-bid.firebaseapp.com",
             databaseURL: "https://roar-bid-default-rtdb.firebaseio.com",
             projectId: "roar-bid",
-            storageBucket: "roar-bid.firebasestorage.app",
+            storageBucket: "roar-bid.appspot.com",
             messagingSenderId: "220357721568",
             appId: "1:220357721568:web:6119d700d8ab1d67083f85"
         };
@@ -218,7 +244,7 @@
         const bidsRef = ref(database, 'bids');
         const highestBidRef = ref(database, 'highestBid');
 
-        let lastHighestBid = 0; // Track last highest bid
+        let lastHighestBid = 0;
 
         window.openModal = function () {
             document.getElementById('bidModal').classList.add('show');
@@ -242,74 +268,72 @@
                         push(bidsRef, { name, phone, city, amount });
                         set(highestBidRef, amount);
 
-                        // Celebration effect if the bid is higher
                         if (amount > lastHighestBid) {
-                            triggerCelebration();
-                            lastHighestBid = amount; // Update the last highest bid
-                        }
+                            lastHighestBid = amount;
+                            const celebration = document.createElement('div');
+                            celebration.className = 'celebration';
+                            celebration.textContent = `Congratulations ${name}! You are the highest bidder with ₹${amount}`;
+                            document.body.appendChild(celebration);
 
+                            setTimeout(() => {
+                                celebration.remove();
+                            }, 2000);
+                        }
                         closeModal();
                     } else {
-                        alert('Your bid must be higher than the current highest bid!');
+                        alert('Your bid must be higher than the current highest bid.');
                     }
                 }, { onlyOnce: true });
             } else {
-                alert('Please fill in all fields with valid data!');
+                alert('Please fill in all fields with valid information.');
             }
         };
 
         onValue(bidsRef, (snapshot) => {
             const bidList = document.getElementById('bidList');
             bidList.innerHTML = '';
-            const bids = [];
+            const bids = snapshot.val();
+            let highestBid = 0;
 
-            snapshot.forEach((childSnapshot) => {
-                bids.push(childSnapshot.val());
-            });
-
-            bids.sort((a, b) => b.amount - a.amount);
-
-            bids.forEach((bid, index) => {
+            for (const key in bids) {
+                const { name, phone, city, amount } = bids[key];
                 const bidItem = document.createElement('div');
-                bidItem.className = 'bid-item' + (index === 0 ? ' highest-bid' : '');
+                bidItem.className = 'bid-item';
                 bidItem.innerHTML = `
-                    <span><strong>Name:</strong> ${bid.name}</span>
-                    <span><strong>City:</strong> ${bid.city}</span>
-                    <span><strong>Bid:</strong> ₹${bid.amount}</span>
+                    <span> ${name}</span>
+                    <span> ${city}</span>
+                    <span> ₹${amount}</span>
                 `;
+                if (amount > highestBid) {
+                    highestBid = amount;
+                    bidItem.classList.add('highest-bid');
+                }
                 bidList.appendChild(bidItem);
-            });
+            }
         });
 
-        const timerElement = document.getElementById('timer');
+        const countdownTimer = (deadline) => {
+            const timerElement = document.getElementById('timer');
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const distance = deadline - now;
 
-        // Set your custom target date and time here
-        const targetDate = new Date('2024-12-24 12:00:00'); // Example: Set to December 24, 2024 at 12:00 PM
+                if (distance < 0) {
+                    timerElement.textContent = 'Bidding has ended.';
+                    clearInterval(interval);
+                } else {
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    timerElement.textContent = `Bid ends in: ${hours}h ${minutes}m ${seconds}s`;
+                }
+            };
+            const interval = setInterval(updateTimer, 1000);
+            updateTimer();
+        };
 
-        setInterval(() => {
-            const distance = targetDate - new Date();
-
-            if (distance > 0) {
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                timerElement.textContent = `Bid ends in: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            } else {
-                timerElement.textContent = 'Bidding has ended!';
-            }
-        }, 1000);
-
-        function triggerCelebration() {
-            const celebrationMessage = document.createElement('div');
-            celebrationMessage.classList.add('celebration');
-            celebrationMessage.textContent = '🎉 New Highest Bid! 🎉';
-            document.body.appendChild(celebrationMessage);
-
-            setTimeout(() => {
-                celebrationMessage.remove();
-            }, 2000);
-        }
+        const biddingDeadline = new Date('2024-12-31T23:59:59').getTime();
+        countdownTimer(biddingDeadline);
     </script>
 </body>
 </html>
