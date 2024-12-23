@@ -7,32 +7,24 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image: url('back.jpeg'); /* Replace with your desktop image URL */
-    background-size: cover;
-    background-position: center;
-    color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    height: 100vh;
-    text-align: center;
-    width: 100%; /* Ensure full width */
-    overflow: hidden; /* Prevents scrollbars if content overflows */
-     /* Font size scales with the viewport width */
-}
-
-@media (max-width: 768px) {
-    body {
-        font-size: 5vw; /* Slightly larger text for smaller screens */
-    }
-}
-
-
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('back.jpeg'); /* Replace with your desktop image URL */
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            text-align: center;
+            width: 100%;
+            overflow: hidden; /* Prevents scrollbars if content overflows */
+            /* Font size scales with the viewport width */
+        }
 
         h1, h2, h3 {
             margin: 20px 0;
@@ -131,8 +123,11 @@ body {
             max-width: 600px;
             margin: 20px auto;
             padding: 10px;
-            max-height: 400px; /* Adjust as necessary */
+            max-height: 50vh; /* Adjust to 50% of the viewport height */
             overflow-y: auto; /* Enable vertical scrolling */
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
         .bid-item {
@@ -198,6 +193,7 @@ body {
                 background-image: url('new.jpeg'); /* Replace with your mobile image URL */
                 background-size: cover;
                 background-position: center;
+                font-size: 5vw; /* Slightly larger text for smaller screens */
             }
         }
     </style>
