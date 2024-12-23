@@ -302,16 +302,18 @@
 
         const timerElement = document.getElementById('timer');
         const targetDate = new Date('2024-12-25 21:59:59');
+        const now = new Date()
 
         setInterval(() => {
             const distance = targetDate - new Date();
 
             if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                timerElement.textContent = `Bid ends in: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timerElement.textContent = `Bid ends in: ${String(days).padStart(2, '0')}d: ${String(hours).padStart(2, '0')}: ${String(minutes).padStart(2, '0')}: ${String(seconds).padStart(2, '0')}`;
             } else {
                 timerElement.textContent = 'Bidding has ended!';
             }
