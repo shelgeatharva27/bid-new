@@ -48,7 +48,7 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 20px 30px;
+            padding: 10px 10px;
             font-size: 20px;
             border-radius: 10px;
             cursor: pointer;
@@ -199,8 +199,8 @@
     </style>
 </head>
 <body>
-    <h2>ROAR FARMSTAYS TIPESHWAR</h2>
-    <h3>Bid Your Price for 31-12-2024</h3>
+    
+    <h4>ROAR FARMSTAYS TIPESHWAR <br> Bid Your Price for 31-12-2024</h4>
     <button class="bid-button" onclick="openModal()">Make a Bid</button>
     <div class="timer" id="timer">Bid ends in: 00:00:00</div>
 
@@ -292,8 +292,8 @@
                 const bidItem = document.createElement('div');
                 bidItem.className = 'bid-item' + (index === 0 ? ' highest-bid' : '');
                 bidItem.innerHTML = `
-                    <span><strong>Name:</strong> ${bid.name}</span>
-                    <span><strong>City:</strong> ${bid.city}</span>
+                    <span><strong></strong> ${bid.name}</span>
+                    <span><strong></strong> ${bid.city}</span>
                     <span><strong>Bid:</strong> ₹${bid.amount}</span>
                 `;
                 bidList.appendChild(bidItem);
